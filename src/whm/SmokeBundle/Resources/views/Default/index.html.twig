@@ -1,9 +1,13 @@
-Hello smoker!
+{% extends "::base.html.twig" %}
 
-{{ form_start(form) }}
+{% block body %}
+    Hello smoker!
+
+    {{ form_start(form) }}
 
     {{ form_errors(form) }}
 
     {{ form_widget(form) }}
 
-{{ form_end(form) }}
+    {{ form_end(form) }}
+{% endblock %}

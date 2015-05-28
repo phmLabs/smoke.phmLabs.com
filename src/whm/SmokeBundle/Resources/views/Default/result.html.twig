@@ -1,13 +1,21 @@
-<h1>Results</h1>
+{% extends "::base.html.twig" %}
 
-{% for url, result in results %}
+{% block body %}
+    <h1>Results</h1>
 
-    Url: {{ url }} <br/>
+    <div class="results">
+        {% for url, result in results %}
+            <div class="result status_{{ result.type }}">
 
-    {% for ruleName, message in result.messages %}
-        {{ ruleName }} -- {{ message }}<br/>
-    {% endfor %}
+                <div class="url">{{ url }}</div>
 
-{% endfor %}
+                <ul class="messages">
+                    {% for ruleName, message in result.messages %}
+                        <li>{{ ruleName }} -- {{ message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
 
-Url: {{ url }}
+{% endblock %}
