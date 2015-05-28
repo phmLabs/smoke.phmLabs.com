@@ -1,3 +1,4 @@
-app:
-    resource: "@AppBundle/Controller/"
-    type:     annotation
+whm_smoke:
+    resource: "@whmSmokeBundle/Resources/config/routing.yml"
+    prefix:   /
+

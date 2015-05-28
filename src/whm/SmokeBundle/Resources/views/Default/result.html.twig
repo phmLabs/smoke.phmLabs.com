@@ -1,0 +1,13 @@
+<h1>Results</h1>
+
+{% for url, result in results %}
+
+    Url: {{ url }} <br/>
+
+    {% for ruleName, message in result.messages %}
+        {{ ruleName }} -- {{ message }}<br/>
+    {% endfor %}
+
+{% endfor %}
+
+Url: {{ url }}

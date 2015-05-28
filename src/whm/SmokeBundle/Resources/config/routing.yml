@@ -1,0 +1,7 @@
+whm_smoke_homepage:
+    path:     /
+    defaults: { _controller: whmSmokeBundle:Default:index }
+
+whm_smoke_analyze:
+    path:     /analyze/
+    defaults: { _controller: whmSmokeBundle:Default:analyze }
