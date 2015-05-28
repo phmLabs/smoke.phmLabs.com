@@ -5,3 +5,7 @@ whm_smoke_homepage:
 whm_smoke_analyze:
     path:     /analyze/
     defaults: { _controller: whmSmokeBundle:Default:analyze }
+
+whm_smoke_show:
+    path:     /show/{resultSet}/
+    defaults: { _controller: whmSmokeBundle:Default:show }

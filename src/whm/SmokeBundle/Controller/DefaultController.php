@@ -7,22 +7,24 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use whm\Smoke\Config\Configuration;
 use whm\Smoke\Scanner\Scanner;
+use whm\SmokeBundle\Entity\ResultSet;
 
 class DefaultController extends Controller
 {
+    const NUM_URLS = 100;
+
     private function getForm()
     {
         return $this->createFormBuilder()
-            ->add('url', 'url', array('label' => 'URL', 'mapped' => false))
-            ->add('saveAndAdd', 'submit', array('label' => 'Analyze'))
+            ->add('url', 'url', array('label' => false, 'mapped' => false))
             ->setAction($this->generateUrl('whm_smoke_analyze'))
             ->getForm();
     }
 
     public function indexAction()
     {
-        $form = $this->getForm();
-        return $this->render('whmSmokeBundle:Default:index.html.twig', array('form' => $form->createView()));
+        $recentResults = $this->getDoctrine()->getRepository('whmSmokeBundle:ResultSet')->findNewest(10);
+        return $this->render('whmSmokeBundle:Default:index.html.twig', array('recentResults' => $recentResults, 'form' => $this->getForm()->createView()));
     }
 
     public function analyzeAction(Request $request)
@@ -31,17 +33,38 @@ class DefaultController extends Controller
         $form->handleRequest($request);
         $data = $request->get("form");
         if ($form->isValid()) {
-            $results = $this->analyzeUrl($data["url"]);
-            return $this->render('whmSmokeBundle:Default:result.html.twig', array('results' => $results, "url" => $data["url"]));
+            $results = $this->analyzeUrl($data["url"], self::NUM_URLS);
+
+            $resultSet = new ResultSet();
+            $resultSet->setUrl($data["url"]);
+            $resultSet->setNumUrls(self::NUM_URLS);
+            $resultSet->setResults($results);
+            $resultSet->setDate(new \DateTime("now"));
+
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($resultSet);
+            $em->flush();
+
+            return $this->redirect($this->generateUrl("whm_smoke_show", array("resultSet" => $resultSet->getId())));
         }
         $form->get("url")->setData($data["url"]);
         return $this->redirect($this->generateUrl("whm_smoke_homepage"));
     }
 
-    private function analyzeUrl($url)
+    public function showAction(ResultSet $resultSet)
+    {
+        $response = $this->render('whmSmokeBundle:Default:result.html.twig', array('num' => $resultSet->getNumUrls(), 'results' => $resultSet->getResults(), "url" => $resultSet->getUrl()));
+
+        $response->setPublic();
+        $response->setMaxAge(86400);
+
+        return $response;
+    }
+
+    private function analyzeUrl($url, $size)
     {
         $config = Configuration::getDefaultConfig(new Uri($url));
-        $config->setContainerSize(20);
+        $config->setContainerSize($size);
         $config->setParallelRequestCount(20);
         $scanner = new Scanner($config);
         return $scanner->scan();

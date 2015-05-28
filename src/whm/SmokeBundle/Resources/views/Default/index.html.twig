@@ -1,13 +1,39 @@
 {% extends "::base.html.twig" %}
 
 {% block body %}
-    Hello smoker!
 
-    {{ form_start(form) }}
+    <h1>Analyze your Website. For free.</h1>
 
-    {{ form_errors(form) }}
+    <div class="form">
+        {{ form_start(form) }}
 
-    {{ form_widget(form) }}
+        {{ form_errors(form) }}
 
-    {{ form_end(form) }}
+        <div class="box">
+            {{ form_row(form.url) }}
+            <button type="submit">
+                <img src="/images/analyze.png" width="30" height="30" alt="submit" />
+            </button>
+        </div>
+
+
+        {{ form_widget(form) }}
+
+        {{ form_end(form) }}
+
+        <div style="clear: both"></div>
+
+        <p class="info">
+            Smoke will crawl the given url and will analyze the first 100 resources that are used.
+        </p>
+    </div>
+
+    <h2>Recent Scans</h2>
+    <div id="recent_results">
+        <ul>
+        {% for result in recentResults %}
+            <li><a href="{{ path("whm_smoke_show", {"resultSet": result.id }) }}">{{ result.url }}</a></li>
+        {% endfor %}
+        </ul>
+    </div>
 {% endblock %}

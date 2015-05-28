@@ -1,0 +1,5 @@
+git pull
+./app/console cache:clear --env=prod
+./app/console assetic:dump
+chmod -R 777 app/cache/
+#chmod -R 755 app/logs/

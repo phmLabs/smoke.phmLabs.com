@@ -1,21 +1,34 @@
 {% extends "::base.html.twig" %}
 
 {% block body %}
-    <h1>Results</h1>
+
+    <h1>Analysis completed</h1>
+
+    <p class="info">
+        smoke has analyzed {{ num }} files starting from <a href="{{ url }}">{{ url }}</a>.
+        <br />
+        <a href="{{ path("whm_smoke_homepage") }}"><span class="button">analyze another website</span></a>
+    </p>
+
+    <div id="hide_passed">
+        <input type="checkbox" id="showPassed" onclick="$('.status_passed').toggle()">
+        <label for="showPassed">Hide violation-free urls</label>
+    </div>
 
     <div class="results">
-        {% for url, result in results %}
-            <div class="result status_{{ result.type }}">
-
-                <div class="url">{{ url }}</div>
-
-                <ul class="messages">
-                    {% for ruleName, message in result.messages %}
-                        <li>{{ ruleName }} -- {{ message }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endfor %}
+            {% for url, result in results %}
+                <div class="result status_{{ result.type }}">
+                    <div class="url"><a href="{{ url }}">{{ url }}</a></div>
+                    <div class="message">
+                        <ul>
+                        {% for ruleName, message in result.messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endfor %}
+        </table>
     </div>
 
 {% endblock %}
