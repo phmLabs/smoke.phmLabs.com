@@ -4,17 +4,23 @@
 
     <h1>Analyze your Website. For free.</h1>
 
+    <div id="processing">
+        <img src="/images/loading.gif" width="28" />
+    </div>
+
+
     <div class="form">
         {{ form_start(form) }}
 
         {{ form_errors(form) }}
 
         <div class="box">
-            {{ form_row(form.url) }}
-            <button type="submit">
-                <img src="/images/analyze.png" width="30" height="30" alt="submit" />
+            {{ form_widget(form.url, {'attr': {'onfocus': '$("#error_msg").html("")'} }) }}
+            <button type="button" onclick="analyzeUrl()">
+                <img src="/images/analyze.png" width="30" height="30" alt="analyze" />
             </button>
         </div>
+        <div id="error_msg"></div>
 
 
         {{ form_widget(form) }}
@@ -36,4 +42,26 @@
         {% endfor %}
         </ul>
     </div>
+
+    <script>
+
+        function analyzeUrl() {
+            $("#processing").show();
+            $.ajax({
+                type: "POST",
+                url: "{{ path("whm_smoke_analyze") }}",
+                data: $("#url_form").serialize(),
+                dataType: "json",
+                success: function(data) {
+                    window.location.href = data.url;
+                },
+                error: function() {
+                    $("#processing").hide();
+                    $("#error_msg").html("unable to analyze");
+                }
+            });
+        }
+
+    </script>
+
 {% endblock %}

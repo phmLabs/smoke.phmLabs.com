@@ -1,0 +1,32 @@
+@media ( max-width: 510px ) {
+    body {
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-bottom: 80px;
+    }
+
+    .box {
+        width: auto;
+    }
+
+    #form_url {
+        width: calc(100% - 80px);
+        height: 30px;
+    }
+
+    .result .url {
+        width: auto;
+    }
+
+    .result .message {
+        width: 80%;
+    }
+
+    footer {
+        width: auto;
+    }
+
+    .validate {
+        display: none;
+    }
+}

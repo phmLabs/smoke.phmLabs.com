@@ -5,6 +5,7 @@ namespace whm\SmokeBundle\Controller;
 use phmLabs\Base\Www\Uri;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use whm\Smoke\Config\Configuration;
 use whm\Smoke\Scanner\Scanner;
 use whm\SmokeBundle\Entity\ResultSet;
@@ -15,7 +16,7 @@ class DefaultController extends Controller
 
     private function getForm()
     {
-        return $this->createFormBuilder()
+        return $this->createFormBuilder(null, ['attr' => ['id' => 'url_form']])
             ->add('url', 'url', array('label' => false, 'mapped' => false))
             ->setAction($this->generateUrl('whm_smoke_analyze'))
             ->getForm();
@@ -29,14 +30,27 @@ class DefaultController extends Controller
 
     public function analyzeAction(Request $request)
     {
+        set_time_limit(120);
+
         $form = $this->getForm();
         $form->handleRequest($request);
         $data = $request->get("form");
         if ($form->isValid()) {
-            $results = $this->analyzeUrl($data["url"], self::NUM_URLS);
+
+            $url = $data["url"];
+
+            if( !Uri::isValid($url)) {
+                throw $this->createNotFoundException('The url can not be analyzed');
+            }
+
+            if (strpos($url, 'http') === false) {
+                $url = "http://" . $url;
+            }
+
+            $results = $this->analyzeUrl($url, self::NUM_URLS);
 
             $resultSet = new ResultSet();
-            $resultSet->setUrl($data["url"]);
+            $resultSet->setUrl($url);
             $resultSet->setNumUrls(self::NUM_URLS);
             $resultSet->setResults($results);
             $resultSet->setDate(new \DateTime("now"));
@@ -45,10 +59,13 @@ class DefaultController extends Controller
             $em->persist($resultSet);
             $em->flush();
 
-            return $this->redirect($this->generateUrl("whm_smoke_show", array("resultSet" => $resultSet->getId())));
+            $response = new Response(json_encode(array('status' => "success", 'url' => $this->generateUrl("whm_smoke_show", array("resultSet" => $resultSet->getId())))));
+            $response->headers->set('Content-Type', 'application/json');
+
+            return $response;
         }
-        $form->get("url")->setData($data["url"]);
-        return $this->redirect($this->generateUrl("whm_smoke_homepage"));
+
+        throw $this->createNotFoundException('The url can not be analyzed');
     }
 
     public function showAction(ResultSet $resultSet)
