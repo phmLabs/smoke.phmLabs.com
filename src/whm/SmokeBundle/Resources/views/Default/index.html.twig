@@ -5,7 +5,7 @@
     <h1>Analyze your Website. For free.</h1>
 
     <div id="processing">
-        <img src="/images/loading.gif" width="28" />
+        <img src="/images/loading.gif" width="28"/>
     </div>
 
 
@@ -17,7 +17,7 @@
         <div class="box">
             {{ form_widget(form.url, {'attr': {'onfocus': '$("#error_msg").html("")'} }) }}
             <button type="button" onclick="analyzeUrl()">
-                <img src="/images/analyze.png" width="30" height="30" alt="analyze" />
+                <img src="/images/analyze.png" width="30" height="30" alt="analyze"/>
             </button>
         </div>
         <div id="error_msg"></div>
@@ -37,9 +37,9 @@
     <h2>Recent Scans</h2>
     <div id="recent_results">
         <ul>
-        {% for result in recentResults %}
-            <li><a href="{{ path("whm_smoke_show", {"resultSet": result.id }) }}">{{ result.url }}</a></li>
-        {% endfor %}
+            {% for result in recentResults %}
+                <li><a href="{{ path("whm_smoke_show", {"resultSet": result.id }) }}">{{ result.url }}</a></li>
+            {% endfor %}
         </ul>
     </div>
 
@@ -52,15 +52,23 @@
                 url: "{{ path("whm_smoke_analyze") }}",
                 data: $("#url_form").serialize(),
                 dataType: "json",
-                success: function(data) {
+                success: function (data) {
                     window.location.href = data.url;
                 },
-                error: function() {
+                error: function () {
                     $("#processing").hide();
                     $("#error_msg").html("unable to analyze");
                 }
             });
         }
+
+
+        $(function () {
+            $("#url_form").on('submit', function () {
+                analyzeUrl();
+                return false;
+            })
+        });
 
     </script>
 

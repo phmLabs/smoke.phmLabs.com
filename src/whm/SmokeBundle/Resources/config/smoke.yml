@@ -1,0 +1,9 @@
+options:
+  extendDefault: true
+
+rules:
+
+  JsSyntaxValid:
+    class: whm\Smoke\Rules\Js\SyntaxRule
+    parameters:
+      jsHintExecutable: jshint

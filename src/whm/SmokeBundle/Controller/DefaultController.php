@@ -6,6 +6,7 @@ use phmLabs\Base\Www\Uri;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Yaml\Yaml;
 use whm\Smoke\Config\Configuration;
 use whm\Smoke\Scanner\Scanner;
 use whm\SmokeBundle\Entity\ResultSet;
@@ -18,7 +19,7 @@ class DefaultController extends Controller
     {
         return $this->createFormBuilder(null, ['attr' => ['id' => 'url_form']])
             ->add('url', 'url', array('label' => false, 'mapped' => false))
-            ->setAction($this->generateUrl('whm_smoke_analyze'))
+            // ->setAction($this->generateUrl('whm_smoke_analyze'))
             ->getForm();
     }
 
@@ -39,7 +40,7 @@ class DefaultController extends Controller
 
             $url = $data["url"];
 
-            if( !Uri::isValid($url)) {
+            if (!Uri::isValid($url)) {
                 throw $this->createNotFoundException('The url can not be analyzed');
             }
 
@@ -80,7 +81,8 @@ class DefaultController extends Controller
 
     private function analyzeUrl($url, $size)
     {
-        $config = Configuration::getDefaultConfig(new Uri($url));
+        $config = new Configuration(new Uri($url), Yaml::parse(file_get_contents(__DIR__ . "/../Resources/config/smoke.yml")));
+
         $config->setContainerSize($size);
         $config->setParallelRequestCount(20);
         $scanner = new Scanner($config);

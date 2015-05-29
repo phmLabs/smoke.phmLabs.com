@@ -144,7 +144,7 @@ table {
 }
 
 #processing {
-    position: fixed;
+    position: absolute;
     top: 209px;
     left: calc(50% + 312px);
     /* width: 100px; */
