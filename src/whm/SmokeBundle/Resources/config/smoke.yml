@@ -1,6 +1,9 @@
 options:
   extendDefault: true
 
+reporter:
+  class: whm\SmokeBundle\Util\CollectionReporter
+
 rules:
 
   JsSyntaxValid:

@@ -9,6 +9,13 @@
         }
     },
 
+    "repositories": [
+    {
+      "type": "vcs",
+      "url": "git@github.com:digitalkaoz/ivory-http-adapter.git"
+    }
+    ],
+
     "prefer-stable": true,
     "minimum-stability": "dev",
 

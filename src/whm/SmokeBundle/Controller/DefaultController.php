@@ -2,7 +2,6 @@
 
 namespace whm\SmokeBundle\Controller;
 
-use phmLabs\Base\Www\Uri;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -10,6 +9,9 @@ use Symfony\Component\Yaml\Yaml;
 use whm\Smoke\Config\Configuration;
 use whm\Smoke\Scanner\Scanner;
 use whm\SmokeBundle\Entity\ResultSet;
+use Phly\Http\Uri;
+use whm\Smoke\Http\HttpClient;
+use Ivory\HttpAdapter\HttpAdapterFactory;
 
 class DefaultController extends Controller
 {
@@ -40,15 +42,18 @@ class DefaultController extends Controller
 
             $url = $data["url"];
 
-            if (!Uri::isValid($url)) {
+            /*if (!Uri::isValid($url)) {
                 throw $this->createNotFoundException('The url can not be analyzed');
             }
-
+*/
             if (strpos($url, 'http') === false) {
                 $url = "http://" . $url;
             }
 
-            $results = $this->analyzeUrl($url, self::NUM_URLS);
+            $config = new Configuration(new Uri($url), Yaml::parse(file_get_contents(__DIR__ . "/../Resources/config/smoke.yml")));
+            $this->analyzeUrl($config, self::NUM_URLS);
+
+            $results = $config->getReporter()->getResults();
 
             $resultSet = new ResultSet();
             $resultSet->setUrl($url);
@@ -79,13 +84,11 @@ class DefaultController extends Controller
         return $response;
     }
 
-    private function analyzeUrl($url, $size)
+    private function analyzeUrl(Configuration $config, $size)
     {
-        $config = new Configuration(new Uri($url), Yaml::parse(file_get_contents(__DIR__ . "/../Resources/config/smoke.yml")));
-
         $config->setContainerSize($size);
         $config->setParallelRequestCount(20);
-        $scanner = new Scanner($config);
+        $scanner = new Scanner($config, new HttpClient(HttpAdapterFactory::guess()));
         return $scanner->scan();
     }
 }

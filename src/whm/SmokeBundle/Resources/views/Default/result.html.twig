@@ -16,7 +16,7 @@
     </div>
 
     <div class="results">
-        {% for url, result in results %}
+        {% for result in results %}
             <div class="result status_{{ result.type }}">
                 <div class="url">
                     <div class="validate">
@@ -31,7 +31,7 @@
                             </a>
                         {% endif %}
                     </div>
-                    <a href="{{ url }}">{{ url }}</a>
+                    <a href="{{ result.url }}">{{ result.url }}</a>
 
                 </div>
                 <div class="message">
